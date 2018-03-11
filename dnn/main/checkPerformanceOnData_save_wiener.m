@@ -43,6 +43,14 @@ unprocessed_stoi_sum = 0;
 
 noise_feat = sprintf('%-15s', [noise ' ' feat]);
 
+% save the model first
+save_prefix_path = ['STORE' filesep 'db' num2str(opts.db) filesep];
+if ~exist(save_prefix_path,'dir'); mkdir(save_prefix_path); end;
+if ~exist([save_prefix_path 'EST_MASK'],'dir'); mkdir([save_prefix_path 'EST_MASK' ]); end;
+if ~exist([save_prefix_path 'sound'],'dir'); mkdir([save_prefix_path 'sound']); end;
+if ~exist([save_prefix_path 'model'],'dir'); mkdir([save_prefix_path 'model']); end;
+save([save_prefix_path 'model' filesep 'ratio_' noise '_db' num2str(opts.db) '_' feat '.mat' ],'net','opts');
+
 for k=1:snr_num
 
   %cur_db = opts.db(k);
@@ -89,7 +97,7 @@ end
 % print STOI of different SNR and noise
 fprintf('\n')
 fprintf('------------------------------------------------------------------')
-for k=1:noise_num
+for k=1:snr_num
   cur_db = opts.db(k);
   for l=1:noise_num
     cur_noise = tmp_str{l};
@@ -101,16 +109,18 @@ end
 
 fprintf('\n\ntotal STOI')
 fprintf(1,['\n#STOI_average# ' noise_feat ' unprocessed_stoi=%-8.4f ideal_stoi=%-8.4f est_stoi=%-8.4f'], unprocessed_stoi_sum/num_test_sents, stoi_ideal_sum/num_test_sents, stoi_est_sum/num_test_sents);
-fprintf('------------------------------------------------------------------\n\n')
+fprintf('\n------------------------------------------------------------------\n\n')
 
-save_prefix_path = ['STORE' filesep 'db' num2str(opts.db) filesep];
-if ~exist(save_prefix_path,'dir'); mkdir(save_prefix_path); end;
-if ~exist([save_prefix_path 'EST_MASK'],'dir'); mkdir([save_prefix_path 'EST_MASK' ]); end;
-if ~exist([save_prefix_path 'sound'],'dir'); mkdir([save_prefix_path 'sound']); end;
-if ~exist([save_prefix_path 'model'],'dir'); mkdir([save_prefix_path 'model']); end;
+%save_prefix_path = ['STORE' filesep 'db' num2str(opts.db) filesep];
+%if ~exist(save_prefix_path,'dir'); mkdir(save_prefix_path); end;
+%if ~exist([save_prefix_path 'EST_MASK'],'dir'); mkdir([save_prefix_path 'EST_MASK' ]); end;
+%if ~exist([save_prefix_path 'sound'],'dir'); mkdir([save_prefix_path 'sound']); end;
+%if ~exist([save_prefix_path 'model'],'dir'); mkdir([save_prefix_path 'model']); end;
+
+% save the result of the data
 save([save_prefix_path 'EST_MASK' filesep 'ratio_MASK_' noise '_' feat '.mat' ],'EST_MASK','IDEAL_MASK','frame_index','DFI');
 save([save_prefix_path 'sound' filesep 'ratio_' noise '_' feat '.mat'],'est_r','ideal_r', 'clean_s', 'mix_s');
-save([save_prefix_path 'model' filesep 'ratio_' noise '_db' num2str(opts.db) '_' feat '.mat' ],'net','opts');
+%save([save_prefix_path 'model' filesep 'ratio_' noise '_db' num2str(opts.db) '_' feat '.mat' ],'net','opts');
 
 
 mse = getMSE(output, label);
